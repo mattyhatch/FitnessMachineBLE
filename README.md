@@ -1,6 +1,6 @@
 # FitnessMachineBLE
 
-How to use: 
+How to use:      
 When you first open the app, make sure to press the location button so then the app can access your devices location.
 This is important because location is needed for a BLE connection.
 Now the app is ready to use. You can set the advertising name in the first activity by editing the text on the screen.
