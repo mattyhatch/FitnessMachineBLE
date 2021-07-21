@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">IndoorBikeBLE</string>
+    <string name="bike">Location</string>
+    <string name="default_value">0</string>
+    <string name="notify">Notify</string>
+    <string name="instant_power">Instantaneous Power</string>
+    <string name="instant_speed">Instantaneous Speed</string>
+    <string name="aver_speed">Average Speed</string>
+    <string name="bike_text">Indoor Bike</string>
+    <string name="tread_text">Treadmill</string>
+    <string name="cross_text">Cross Trainer</string>
+    <string name="heart_rate">Heart Rate</string>
+    <string name="instant_cadence">Instant Cadence</string>
+    <string name="incline">Inclination</string>
+    <string name="ramp_angle">Ramp Angle Setting</string>
+    <string name="resistance">Resistance Level</string>
+    <string name="steps">Steps Per Minute</string>
+    <string name="device_name">Set Device Name</string>
+    <string name="fitness">FitnessBLE</string>
+</resources>
