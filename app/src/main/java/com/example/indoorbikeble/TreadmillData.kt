@@ -13,6 +13,9 @@ import kotlinx.android.synthetic.main.activity_treadmill_data.*
 import java.nio.charset.Charset
 import java.util.*
 
+/**
+ * class for Treadmill Activity
+ */
 class TreadmillData : AppCompatActivity() {
     //Advertising flag
     private var isAdvertising = false
@@ -59,10 +62,8 @@ class TreadmillData : AppCompatActivity() {
             .build()
     }
     private val advertisingCallback = object : AdvertiseCallback() {
-        override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
-            super.onStartSuccess(settingsInEffect)
-        }
         override fun onStartFailure(errorCode:Int) {
+            super.onStartFailure(errorCode)
             isAdvertising = false
             Log.e("Advertising","Failed")
         }
@@ -83,6 +84,14 @@ class TreadmillData : AppCompatActivity() {
     private lateinit var mTreadmillDataCharacteristic: BluetoothGattCharacteristic
     private lateinit var mGattServer: BluetoothGattServer
     private val mGattServerCallback = object: BluetoothGattServerCallback() {
+        /**
+         * If the connection state changes to connected, we want to create an object of the device it is connected to
+         * Else(when the connection state changes to disconnected), we want to get rid of the object of the device
+         * that we used to be connected to
+         * @param [device] object of the device that changed connection states with us
+         * @param [status] indicates of we are connected or not
+         * @param [newState] indicates the new connection state we are in
+         */
         override fun onConnectionStateChange(device: BluetoothDevice?, status: Int, newState: Int) {
             super.onConnectionStateChange(device, status, newState)
             if(status == BluetoothGatt.GATT_SUCCESS) {
@@ -96,6 +105,13 @@ class TreadmillData : AppCompatActivity() {
             }
         }
 
+        /**
+         * On read request, we want to send over the values of our characteristic
+         * @param [device] object of the device we are connected to
+         * @param [requestId] Id of the request
+         * @param [characteristic] the characteristic the client is trying to read
+         * @param [offset] Offset into the value of the characteristic
+         */
         override fun onCharacteristicReadRequest(
             device: BluetoothDevice?,
             requestId: Int,
@@ -115,6 +131,14 @@ class TreadmillData : AppCompatActivity() {
             }
         }
 
+        /**
+         * On descriptor read request, we want to send the value of the descriptor to the client that is requesting
+         *
+         * @param [device] object of the device that we are connected to
+         * @param [requestId] Id of the request
+         * @param [offset] Offset into the value of the characteristic
+         * @param [descriptor] The descriptor that the client wants to read
+         */
         override fun onDescriptorReadRequest(
             device: BluetoothDevice?,
             requestId: Int,
@@ -130,6 +154,16 @@ class TreadmillData : AppCompatActivity() {
             mGattServer.sendResponse(device,requestId, BluetoothGatt.GATT_SUCCESS,offset,descriptor?.value)
         }
 
+        /**
+         * the client has requested to write to the descriptor, so we send our response to that request
+         * @param [device] object of the device we are connected to
+         * @param [requestId] Id of the request
+         * @param [descriptor] the descriptor that the client is trying to write to
+         * @param [preparedWrite] true if the write operation should be queued for later
+         * @param [responseNeeded] true if the client requires a response
+         * @param [offset] Offset into the given value
+         * @param [value] the value that the client wants to assign to the descriptor
+         */
         override fun onDescriptorWriteRequest(
             device: BluetoothDevice?,
             requestId: Int,
@@ -178,31 +212,33 @@ class TreadmillData : AppCompatActivity() {
             }
         }
     }
+    /**
+     * Initializes our bluetooth characteristic,service, and server and then starts advertising
+     */
 
-    //Initializes our bluetooth characteristic,service, and server and then starts advertising
     private fun setupFitnessMachine() {
-        val temp3 = intent.extras?.getString("fitness")
-        BluetoothAdapter.getDefaultAdapter().setName(temp3)
+        val deviceName = intent.extras?.getString("fitness")
+        BluetoothAdapter.getDefaultAdapter().setName(deviceName)
         mTreadmillDataCharacteristic = BluetoothGattCharacteristic(
             treadUuid.uuid,
             BluetoothGattCharacteristic.PROPERTY_READ,
             BluetoothGattCharacteristic.PERMISSION_READ
         )
-        val temp = BluetoothGattDescriptor(
+        val clientDescriptor = BluetoothGattDescriptor(
             clientUuid,
             (BluetoothGattDescriptor.PERMISSION_READ)
         )
-        temp.setValue(byteArrayOf(0, 0))
-        mTreadmillDataCharacteristic.addDescriptor(temp)
+        clientDescriptor.setValue(byteArrayOf(0, 0))
+        mTreadmillDataCharacteristic.addDescriptor(clientDescriptor)
 
-        val temp2 = BluetoothGattDescriptor(
+        val charDescriptor = BluetoothGattDescriptor(
             charUuid,
             BluetoothGattDescriptor.PERMISSION_READ
         )
         val stringT = "Speed of the fitness machine in kilometers" +
                 " per hour"
-        temp2.setValue(stringT.toByteArray(Charset.forName("UTF-8")))
-        mTreadmillDataCharacteristic.addDescriptor(temp2)
+        charDescriptor.setValue(stringT.toByteArray(Charset.forName("UTF-8")))
+        mTreadmillDataCharacteristic.addDescriptor(charDescriptor)
 
         bluetoothGattService = BluetoothGattService(
             fitnessUuid.uuid,
@@ -215,7 +251,9 @@ class TreadmillData : AppCompatActivity() {
         advertiser.startAdvertising(settings,adData,mAdvScanResponse,advertisingCallback)
     }
 
-
+    /**
+     * Creates the Treadmill activity and sets the onClick functions for the buttons
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_treadmill_data)
@@ -229,15 +267,20 @@ class TreadmillData : AppCompatActivity() {
         notify_button2.setOnClickListener{broadcastData()}
     }
 
-    //Broadcasts our Treadmill data values to the BLE client
+    /**
+     * Broadcasts our Treadmill data values to the BLE client
+     * Does this by adding the values to the Treadmill characteristic and then sends it
+     * over to the client through the mGattServer
+     */
+
     private fun broadcastData() {
         heartRate = heart_rate2.text.toString().toInt()
-        val temp3 = ramp_angle2.text.toString().toDouble()
-        rampAngle = (temp3*10).toInt()
-        val temp1 = incline2.text.toString().toDouble()
-        incline = (temp1*10).toInt()
-        val temp = instant_speed2.text.toString().toDouble()
-        instantSpeed = (temp*100).toInt()
+        val rampAngleDouble = ramp_angle2.text.toString().toDouble()
+        rampAngle = (rampAngleDouble*10).toInt()
+        val inclineDouble = incline2.text.toString().toDouble()
+        incline = (inclineDouble*10).toInt()
+        val instantSpeedDouble = instant_speed2.text.toString().toDouble()
+        instantSpeed = (instantSpeedDouble*100).toInt()
         //min and max values
         if(heartRate > 200) {
             heartRate = 200
@@ -272,7 +315,9 @@ class TreadmillData : AppCompatActivity() {
         mGattServer.notifyCharacteristicChanged(bluetoothDevice,mTreadmillDataCharacteristic,indicate)
     }
 
-    //Disconnects us from the client and stops advertising
+    /**
+     * Disconnects us from the client and stops advertising
+     */
     private fun disconnect() {
         if(bluetoothDevice != null) {
             mGattServer.cancelConnection(bluetoothDevice)
