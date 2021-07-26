@@ -14,7 +14,7 @@ import java.nio.charset.Charset
 import java.util.*
 
 /**
- * class for Treadmill Activity
+ * class for Treadmill activity
  */
 class TreadmillData : AppCompatActivity() {
     //Advertising flag
@@ -235,8 +235,7 @@ class TreadmillData : AppCompatActivity() {
             charUuid,
             BluetoothGattDescriptor.PERMISSION_READ
         )
-        val stringT = "Speed of the fitness machine in kilometers" +
-                " per hour"
+        val stringT = "Data for Treadmill"
         charDescriptor.setValue(stringT.toByteArray(Charset.forName("UTF-8")))
         mTreadmillDataCharacteristic.addDescriptor(charDescriptor)
 

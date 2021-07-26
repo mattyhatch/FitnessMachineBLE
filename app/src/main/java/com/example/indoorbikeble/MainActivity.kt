@@ -13,7 +13,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.alert
 
 /**
- * Class for main (first page of the app)
+ * Class for main activity (first page of the app)
  */
 const val LOCATION_PERMISSION_REQUEST_CODE = 2
 class MainActivity : AppCompatActivity() {

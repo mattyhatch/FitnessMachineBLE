@@ -13,6 +13,10 @@ import kotlinx.android.synthetic.main.activity_cross_data2.*
 import java.nio.charset.Charset
 import java.util.*
 
+/**
+ * Class for Cross Trainer activity
+ */
+
 class CrossData : AppCompatActivity() {
     //Advertising flag
     private var isAdvertising = false
@@ -233,8 +237,7 @@ class CrossData : AppCompatActivity() {
             charUuid,
             BluetoothGattDescriptor.PERMISSION_READ
         )
-        val stringT = "Speed of the fitness machine in kilometers" +
-                " per hour"
+        val stringT = "Data for Cross Trainer"
         charDescriptor.setValue(stringT.toByteArray(Charset.forName("UTF-8")))
         mCrossTrainerDataCharacteristic.addDescriptor(charDescriptor)
 

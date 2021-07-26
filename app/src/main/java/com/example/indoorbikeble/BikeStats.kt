@@ -13,6 +13,9 @@ import kotlinx.android.synthetic.main.activity_bike_stats.*
 import java.nio.charset.Charset
 import java.util.*
 
+/**
+ * Class for Indoor Bike activity
+ */
 class BikeStats : AppCompatActivity() {
     //Advertising flag
     private var isAdvertising = false
@@ -229,8 +232,7 @@ class BikeStats : AppCompatActivity() {
             charUuid,
             BluetoothGattDescriptor.PERMISSION_READ
         )
-        val stringT = "Speed of the fitness machine in kilometers" +
-                " per hour"
+        val stringT = "Data for Indoor Bike"
         charDescriptor.setValue(stringT.toByteArray(Charset.forName("UTF-8")))
         mIndoorBikeDataCharacteristic.addDescriptor(charDescriptor)
 
